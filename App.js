@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, SafeAreaView, ScrollView } from 'react-native';
+import { StyleSheet, Text, SafeAreaView, ScrollView, View } from 'react-native';
 import { colors } from './src/constants';
 import Keyboard from './src/components/Keyboard';
 
@@ -51,7 +51,7 @@ export default function App() {
                   },
                 ]}
               >
-                <Text style={style.cellText}>{cell.toUpperCase()}</Text>
+                <Text style={styles.cellText}>{cell.toUpperCase()}</Text>
               </View>
             ))}
           </View>
