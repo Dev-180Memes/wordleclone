@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
-import { Text, View, ScrollView, Alert } from "react-native";
+import { Text, View, ScrollView, Alert, ActivityIndicator } from "react-native";
 import { colors, CLEAR, ENTER, colorsToEmoji } from "../../constants";
 import Keyboard from "../Keyboard";
 import * as Clipboard from "expo-clipboard";
 import words from '../../words';
 import styles from "./Game.styles"
 import { copyArray, getDayOfTheYear } from '../../utils';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NUMBER_OF_TRIES = 6;
 
-const dayOfTheYear = getDayOfTheYear(); 
+const dayOfTheYear = getDayOfTheYear();
 
 const Game = () => {
+  // AsyncStorage.removeItem("@game");
   const word = words[dayOfTheYear];
   const letters = word.split(""); // ['h', 'e', 'l', 'l', 'o']
 
@@ -21,12 +23,54 @@ const Game = () => {
   const [curRow, setCurRow] = useState(0);
   const [curCol, setCurCol] = useState(0);
   const [gameState, setGameState] = useState("playing"); // won, lost, playing
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     if (curRow > 0) {
       checkGameState();
     }
   }, [curRow]);
+
+  useEffect(() => {
+    if (loaded) {
+      persistState();
+    }
+  }, [rows, curRow, curCol, gameState]);
+
+  useEffect(() => {
+    readState();
+  }, [])
+
+  const persistState = async () => {
+    // write all the state variables in async storage
+    const data = {
+      rows,
+      curRow,
+      curCol,
+      gameState,
+    };
+
+    try {
+      const dataString = JSON.stringify(data); // later: JSON.parse(string);
+      await AsyncStorage.setItem('@game', dataString);
+    } catch (e) {
+      console.log("Failed to write data to storage", e);
+    }
+  };
+
+  const readState = async () => {
+    const dataString = await AsyncStorage.getItem("@game");
+    try {
+      const data = JSON.parse(dataString);
+      setRows(data.rows);
+      setCurCol(data.curCol);
+      setCurRow(data.curRow);
+      setGameState(data.gameState);
+    } catch(e) {
+      console.log("Couldn't parse data")
+    }
+    setLoaded(true);
+  }
 
   const checkGameState = () => {
     if (checkIfWon() && gameState !== "won") {
@@ -47,7 +91,7 @@ const Game = () => {
       )
       .filter((row) => row)
       .join("\n");
-    const textToShare = `Wordle Clone By 180Memes \n${textMap}`;
+    const textToShare = `DevWords \n${textMap}`;
     Clipboard.setString(textToShare);
     Alert.alert("Copied successfully", "Share your score on you social media");
   };
@@ -123,6 +167,10 @@ const Game = () => {
   const greenCaps = getAllLettersWithColor(colors.primary);
   const yellowCaps = getAllLettersWithColor(colors.secondary);
   const greyCaps = getAllLettersWithColor(colors.darkgrey);
+
+  if (!loaded) {
+    return (<ActivityIndicator />)
+  }
 
   return (
     <>

@@ -9,7 +9,7 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
 
-      <Text style={styles.title}>WORDLE</Text>
+      <Text style={styles.title}>DEVWORDS</Text>
 
       <Game />
     </SafeAreaView>
