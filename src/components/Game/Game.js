@@ -5,12 +5,14 @@ import Keyboard from "../Keyboard";
 import * as Clipboard from "expo-clipboard";
 import words from '../../words';
 import styles from "./Game.styles"
-import { copyArray, getDayOfTheYear } from '../../utils';
+import { copyArray, getDayOfTheYear, getDayKey } from '../../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import EndScreen from "../EndScreen";
 
 const NUMBER_OF_TRIES = 6;
 
 const dayOfTheYear = getDayOfTheYear();
+const daykey = getDayKey;
 
 const Game = () => {
   // AsyncStorage.removeItem("@game");
@@ -43,7 +45,7 @@ const Game = () => {
 
   const persistState = async () => {
     // write all the state variables in async storage
-    const data = {
+    const dataForToday = {
       rows,
       curRow,
       curCol,
@@ -51,7 +53,14 @@ const Game = () => {
     };
 
     try {
-      const dataString = JSON.stringify(data); // later: JSON.parse(string);
+      let existingStateString = await AsyncStorage.getItem("@game");
+      let existingState = existingStateString 
+        ? JSON.parse(existingStateString) 
+        : {};
+
+      existingState[daykey] = dataForToday
+
+      const dataString = JSON.stringify(existingState); // later: JSON.parse(string);
       await AsyncStorage.setItem('@game', dataString);
     } catch (e) {
       console.log("Failed to write data to storage", e);
@@ -62,10 +71,11 @@ const Game = () => {
     const dataString = await AsyncStorage.getItem("@game");
     try {
       const data = JSON.parse(dataString);
-      setRows(data.rows);
-      setCurCol(data.curCol);
-      setCurRow(data.curRow);
-      setGameState(data.gameState);
+      const day = data[daykey];
+      setRows(day.rows);
+      setCurCol(day.curCol);
+      setCurRow(day.curRow);
+      setGameState(day.gameState);
     } catch(e) {
       console.log("Couldn't parse data")
     }
@@ -79,8 +89,8 @@ const Game = () => {
       ]);
       setGameState("won");
     } else if (checkIfLost() && gameState !== "lost") {
-      Alert.alert("Meh", "Try again tomorrow!");
-      setGameState("lost");
+      // Alert.alert("Meh", "Try again tomorrow!");
+      // setGameState("lost");
     }
   };
 
@@ -170,6 +180,10 @@ const Game = () => {
 
   if (!loaded) {
     return (<ActivityIndicator />)
+  }
+
+  if (gameState !== 'playing') {
+    return (<EndScreen gwon={gameState === "won"} />)
   }
 
   return (
