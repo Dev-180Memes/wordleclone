@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet } from 'react-native';
-import React from 'react';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { colors } from '../../constants';
 
 const Number = ({number, label}) => (
@@ -37,10 +37,48 @@ const GuessDistributionLine = ({ position, amount, percentage }) => {
 };
 
 const GuessDistribution = () => {
-    
+    return (
+        <>
+            <Text style={styles.subtitle}>GUESS DISTRIBUTION</Text>
+            <View style={{ width: "100%", padding: 20, justifyContent: "flex-start" }}>
+                <GuessDistributionLine position={0} amount={2} percentage={50} />
+                <GuessDistributionLine position={0} amount={2} percentage={70} />
+            </View>
+        </>
+        
+    )
 }
 
 const EndScreen = ({ won = false }) => {
+    const share = () => {
+
+    }
+    const [secondsTillTomorrow, setSecondsTillTomorrow] = useState(0);
+
+    useEffect(() => {
+        const updateTime = () => {
+            const now = new Date();
+            const tomorrow = new Date(
+                now.getFullYear(), 
+                now.getMonth(), 
+                now.getDate() + 1
+            );
+
+            setSecondsTillTomorrow((tomorrow - now) / 1000);
+        }
+
+        const interval = setInterval(updateTime, 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const formatSeconds = () => {
+        const hours = Math.floor(setSecondsTillTomorrow / (60 * 60));
+        const minutes = Math.floor((setSecondsTillTomorrow % (60 * 60)) / (60));
+        const seconds = Math.floor(setSecondsTillTomorrow % 60);
+
+        return `${hours}:${minutes}:${seconds}`;
+    }
+
   return (
     <View style={{ width: "100%", alignItems: "center"}}>
         <Text style={styles.title}>
@@ -55,10 +93,35 @@ const EndScreen = ({ won = false }) => {
             <Number number={2} label={"Max Streak"} />
         </View>
 
-        <Text style={styles.subtitle}>GUESS DISTRIBUTION</Text>
-        <View style={{ width: "100%", padding: 20, justifyContent: "flex-start" }}>
-            <GuessDistributionLine position={0} amount={2} percentage={50} />
+        <GuessDistribution />
+
+        <View style={{ flexDirection: "row", padding: 10 }}>
+            <View style={{ alignItems: "center", flex: 1 }}>
+                <Text style={{ color: colors.lightgrey }}>Next Wordle</Text>
+                <Text 
+                    style={{ 
+                        color: colors.lightgrey, 
+                        fontSize: 20, 
+                        fontWeight: 'bold' 
+                    }}
+                >
+                    {formatSeconds()}
+                </Text>
+            </View>
+            <Pressable 
+                onPress={share}
+                style={{ 
+                    flex: 1, 
+                    backgroundColor: colors.primary, 
+                    borderRadius: 25, 
+                    alignItems: "center", 
+                    justifyContent: "center" 
+                }}
+            >
+                <Text style={{ color: colors.lightgrey, fontWeight: 'bold'}}>Share</Text>
+            </Pressable>
         </View>
+
     </View>
   );
 };
