@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Text, View, ScrollView, Alert, ActivityIndicator } from "react-native";
 import { colors, CLEAR, ENTER, colorsToEmoji } from "../../constants";
 import Keyboard from "../Keyboard";
-import * as Clipboard from "expo-clipboard";
 import words from '../../words';
 import styles from "./Game.styles"
 import { copyArray, getDayOfTheYear, getDayKey } from '../../utils';
@@ -84,26 +83,14 @@ const Game = () => {
 
   const checkGameState = () => {
     if (checkIfWon() && gameState !== "won") {
-      Alert.alert("Huraaay", "You won!", [
-        { text: "Share", onPress: shareScore },
-      ]);
+      // Alert.alert("Huraaay", "You won!", [
+      //   { text: "Share", onPress: shareScore },
+      // ]);
       setGameState("won");
     } else if (checkIfLost() && gameState !== "lost") {
       // Alert.alert("Meh", "Try again tomorrow!");
-      // setGameState("lost");
+      setGameState("lost");
     }
-  };
-
-  const shareScore = () => {
-    const textMap = rows
-      .map((row, i) =>
-        row.map((cell, j) => colorsToEmoji[getCellBGColor(i, j)]).join("")
-      )
-      .filter((row) => row)
-      .join("\n");
-    const textToShare = `DevWords \n${textMap}`;
-    Clipboard.setString(textToShare);
-    Alert.alert("Copied successfully", "Share your score on you social media");
   };
 
   const checkIfWon = () => {
@@ -183,7 +170,13 @@ const Game = () => {
   }
 
   if (gameState !== 'playing') {
-    return (<EndScreen gwon={gameState === "won"} />)
+    return (
+      <EndScreen 
+        won={gameState === "won"} 
+        rows={rows} 
+        getCellBGColor={getCellBGColor} 
+      />
+    )
   }
 
   return (
