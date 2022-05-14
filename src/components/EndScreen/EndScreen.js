@@ -1,9 +1,10 @@
-import { View, Text, Pressable, Alert } from 'react-native';
+import { View, Text, Pressable, Alert, StyleSheet } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { colors, colorsToEmoji } from '../../constants';
 import * as Clipboard from "expo-clipboard";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Animated, { SlideInLeft } from "react-native-reanimated";
+// import Animated, { SlideInLeft } from "react-native-reanimated";
+import GuessDistribution from './GuessDistibution/GuessDistribution';
 
 const Number = ({number, label}) => (
     <View style={{alignItems: "center", margin: 10}}>
@@ -62,11 +63,12 @@ const EndScreen = ({ won = false, rows, getCellBGColor }) => {
         } catch(e) {
           console.log("Couldn't parse data")
         }
-        const keys = Object.keys(data);
-        const values = Object.values(data);
+        // const keys = Object.keys(data);
+        // const values = Object.values(data);
+        
 
         // number of games played
-        setPlayed(keys.length);
+        {/* setPlayed(keys.length);
 
         // number of games won
         const numberOfWins = values.filter(
@@ -93,18 +95,18 @@ const EndScreen = ({ won = false, rows, getCellBGColor }) => {
             prevDay = day;
         });
         setCurStreak(_curStreak);
-        setMaxStreak(maxStreak);
+        setMaxStreak(maxStreak); */}
 
         // guess distribution
         const dist = [0, 0, 0, 0, 0, 0]
 
-        values.map(game => {
+        {/* values.map(game => {
             if (game.gameState === 'won') {
                 const tries = game.rows.filter(row => row[0]).length;
                 dist[tries] = dist[tries] + 1
             }
         });
-        setDistribution(dist);
+        setDistribution(dist); */}
     };
 
     const formatSeconds = () => {
@@ -117,11 +119,11 @@ const EndScreen = ({ won = false, rows, getCellBGColor }) => {
 
   return (
     <View style={{ width: "100%", alignItems: "center"}}>
-        <Animated.Text entering={SlideInLeft.springify().mass(0.5)} style={styles.title}>
+        <Text style={styles.title}>
             {won ? "Congrats!" : "Meh, try again tomorrow"}
-        </Animated.Text>
+        </Text>
 
-        <Animated.View entering={SlideInLeft.delay(100).springify().mass(0.5)}>
+        {/* <View>
             <Text style={styles.subtitle}>STATISTICS</Text>
             <View style={{ flexDirection: "row", marginBottom: 20 }}>
                 <Number number={played} label={"Played"} />
@@ -129,18 +131,13 @@ const EndScreen = ({ won = false, rows, getCellBGColor }) => {
                 <Number number={curStreak} label={"Cur Streak"} />
                 <Number number={maxStreak} label={"Max Streak"} />
             </View>
-        </Animated.View>
+        </View>
 
-        <Animated.View 
-            entering={SlideInLeft.delay(200).springify().mass(0.5)}
-            style={{ width: "100%" }}
-        >
-            <GuessDistribution distribution={distribution} />
-        </Animated.View>
+        <GuessDistribution /> */}
 
-        <Animated.View 
-            entering={SlideInLeft.delay(300).springify().mass(0.5)}
-            style={{ flexDirection: "row", padding: 10 }}
+        <View 
+            // entering={SlideInLeft.delay(300).springify().mass(0.5)}
+            style={{ flexDirection: "row", padding: 50, }}
         >
             <View style={{ alignItems: "center", flex: 1 }}>
                 <Text style={{ color: colors.lightgrey }}>Next Wordle</Text>
@@ -166,10 +163,26 @@ const EndScreen = ({ won = false, rows, getCellBGColor }) => {
             >
                 <Text style={{ color: colors.lightgrey, fontWeight: 'bold'}}>Share</Text>
             </Pressable>
-        </Animated.View>
+        </View>
 
     </View>
   );
 };
 
-export default EndScreen
+const styles = StyleSheet.create({
+    title: {
+        fontSize: 30,
+        color: "white",
+        textAlign: "center",
+        marginVertical: 20,
+    },
+    subtitle: {
+        fontSize: 20,
+        color: colors.lightgrey,
+        textAlign: "center",
+        marginVertical: 15,
+        fontWeight: "bold",
+    },
+});
+
+export default EndScreen;

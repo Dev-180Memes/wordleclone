@@ -1,7 +1,8 @@
 import GuessDistributionLine from "./GuessDistributionLine";
-import { styles } from "./EndScreen.styles";
+import { StyleSheet } from "react-native";
+import { colors } from "../../../constants";
 
-export const GuessDistribution = ({ distribution }) => {
+const GuessDistribution = ({ distribution }) => {
     if (!distribution) {
         return null;
     }
@@ -22,4 +23,22 @@ export const GuessDistribution = ({ distribution }) => {
         </>
         
     )
-}
+};
+
+const styles = StyleSheet.create({
+    title: {
+        fontSize: 30,
+        color: "white",
+        textAlign: "center",
+        marginVertical: 20,
+    },
+    subtitle: {
+        fontSize: 20,
+        color: colors.lightgrey,
+        textAlign: "center",
+        marginVertical: 15,
+        fontWeight: "bold",
+    },
+});
+
+export default GuessDistribution
